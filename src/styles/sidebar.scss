@@ -61,22 +61,26 @@
     // menu hover
     .submenu-title-noDropdown,
     .el-submenu__title {
+      font-size: 12px !important;
       &:hover {
         background-color: $menuHover !important;
+        font-size: 12px !important;
       }
     }
 
     .is-active>.el-submenu__title {
       color: $subMenuActiveText !important;
+      font-size: 12px !important;
     }
 
     & .nest-menu .el-submenu>.el-submenu__title,
     & .el-submenu .el-menu-item {
       min-width: $sideBarWidth !important;
       background-color: $subMenuBg !important;
-
+      font-size: 12px !important;
       &:hover {
         background-color: $subMenuHover !important;
+        font-size: 12px !important;
       }
     }
   }
@@ -179,9 +183,11 @@
 
   .nest-menu .el-submenu>.el-submenu__title,
   .el-menu-item {
+    font-size: 12px !important;
     &:hover {
       // you can use $subMenuHover
       background-color: $menuHover !important;
+      font-size: 12px !important;
     }
   }
 

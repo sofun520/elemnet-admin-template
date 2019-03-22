@@ -37,25 +37,51 @@ export const constantRouterMap = [
       component: () => import('@/views/dashboard/index')
     }]
   },
-
+  {
+    path:'/sysconfig',
+    component: Layout,
+    name: 'sysconfig',
+    meta: { title: '系统设置', icon: 'example' },
+    redirect: '/sysconfig/user',
+    children:[
+      {
+        path: 'user',
+        name: 'user',
+        component: () => import('@/views/sysconfig/user/index'),
+        meta: { title: '用户设置', icon: 'table' }
+      },
+      {
+        path: 'resource',
+        name: 'resource',
+        component: () => import('@/views/sysconfig/resource/index'),
+        meta: { title: '资源管理', icon: 'table' }
+      },
+      {
+        path: 'role',
+        name: 'role',
+        component: () => import('@/views/sysconfig/role/index'),
+        meta: { title: '角色管理', icon: 'table' }
+      }
+    ]
+  },
   {
     path: '/example',
     component: Layout,
     redirect: '/example/table',
     name: 'Example',
-    meta: { title: 'Example', icon: 'example' },
+    meta: { title: '样例', icon: 'example' },
     children: [
       {
         path: 'table',
         name: 'Table',
         component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
+        meta: { title: '表格', icon: 'table' }
       },
       {
         path: 'tree',
         name: 'Tree',
         component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
+        meta: { title: '树形结构', icon: 'tree' }
       }
     ]
   },
@@ -68,7 +94,7 @@ export const constantRouterMap = [
         path: 'index',
         name: 'Form',
         component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
+        meta: { title: '表格', icon: 'form' }
       }
     ]
   },
@@ -137,7 +163,7 @@ export const constantRouterMap = [
     children: [
       {
         path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
+        meta: { title: '外链', icon: 'link' }
       }
     ]
   },

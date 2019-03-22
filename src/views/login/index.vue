@@ -1,12 +1,12 @@
 <template>
   <div class="login-container">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-      <h3 class="title">vue-admin-template</h3>
+      <h3 class="title">XX系统</h3>
       <el-form-item prop="username">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
-        <el-input v-model="loginForm.username" name="username" type="text" auto-complete="on" placeholder="username" />
+        <el-input v-model="loginForm.username" name="username" type="text" auto-complete="on" placeholder="请输入用户名" />
       </el-form-item>
       <el-form-item prop="password">
         <span class="svg-container">
@@ -17,7 +17,7 @@
           v-model="loginForm.password"
           name="password"
           auto-complete="on"
-          placeholder="password"
+          placeholder="请输入密码"
           @keyup.enter.native="handleLogin" />
         <span class="show-pwd" @click="showPwd">
           <svg-icon :icon-class="pwdType === 'password' ? 'eye' : 'eye-open'" />
@@ -25,13 +25,13 @@
       </el-form-item>
       <el-form-item>
         <el-button :loading="loading" type="primary" style="width:100%;" @click.native.prevent="handleLogin">
-          Sign in
+          登录
         </el-button>
       </el-form-item>
-      <div class="tips">
+      <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
         <span> password: admin</span>
-      </div>
+      </div> -->
     </el-form>
   </div>
 </template>
@@ -58,8 +58,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: 'admin'
+        username: '',
+        password: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -87,15 +87,49 @@ export default {
       }
     },
     handleLogin() {
+      var that = this;
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true
-          this.$store.dispatch('Login', this.loginForm).then(() => {
-            this.loading = false
-            this.$router.push({ path: this.redirect || '/' })
-          }).catch(() => {
-            this.loading = false
+          that.loading = true
+          console.log(this.redirect || '/');
+          that.$axios.post('/api/login',{account:that.loginForm.username,password:that.loginForm.password}).then((response) => {
+            console.log(response.data)
+            if(response.data.success && response.data.data.token){
+              that.loading = false
+              localStorage.setItem("token",response.data.data.token);
+
+              console.log('sdfdsfdf');
+
+              //将用户信息保存到vuex中
+              that.$store.dispatch('Login', this.loginForm).then(() => {
+                that.loading = false
+                that.$router.push({ path: this.redirect || '/' })
+              }).catch(() => {
+                that.loading = false
+              })
+            }else{
+              that.loading = false
+              that.$message.error('用户名或密码错误，请重新输入');
+            }
           })
+          .catch((res) => {
+            console.log(res);
+          })
+
+          // this.$axios({
+          //   method:'get',
+          //   url:'/api/role/page',
+          //   headers:{
+          //     'token':localStorage.getItem('token')
+          //   }
+          // }).then(function(res){
+          //   console.log(res)
+          // }).catch(function(err){
+          //   console.log(err)
+          // });
+
+
+          
         } else {
           console.log('error submit!!')
           return false

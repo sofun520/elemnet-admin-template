@@ -12,6 +12,8 @@ import App from './App'
 import store from './store'
 import router from './router'
 
+import axios from 'axios'
+
 import '@/icons' // icon
 import '@/permission' // permission control
 
@@ -25,7 +27,10 @@ import '@/permission' // permission control
  */
 import '../mock' // simulation data
 
+Vue.use(axios)
 Vue.use(ElementUI, { locale })
+
+Vue.prototype.$axios = axios
 
 Vue.config.productionTip = false
 
