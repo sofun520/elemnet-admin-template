@@ -1,5 +1,6 @@
 import axios from 'axios'//引入axios
 
+import ElementUI from 'element-ui'
 export default {
   fetch: function (options) {
     var _this = this
@@ -19,7 +20,13 @@ export default {
           //拦截请求，根据errCode来进行不同的操作
 
           resolve(response)//把请求到的数据发到引用请求的地方
-
+          if(response.data.success){
+            resolve(response);
+          }else{
+            console.log(response.data.errorMsg);
+            // _this.$Message(response.data.errorMsg);
+            ElementUI.Message.error(response.data.errorMsg+'，请稍后重试');
+          }
           /*if (response.data.success) {
             resolve(response)//把请求到的数据发到引用请求的地方
           } else {

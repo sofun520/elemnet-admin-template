@@ -69,26 +69,57 @@
       </el-pagination>
     </div>
 
-    <el-dialog title="配置角色菜单" :visible.sync="setRolePermissionDialog" width="50%">
+    <el-dialog :close-on-click-modal="false" title="配置角色菜单" :visible.sync="setRolePermissionDialog" width="60%">
       <el-row>
-        <el-col :span="12">
-          <div>
+        <el-col :span="8">
+          <div class="rolePermissionPanelLeft">
             <el-tree
               :data="treeData"
               show-checkbox
               default-expand-all
+              :expand-on-click-node="false"
               node-key="id"
+              ref="tree"
+              @node-click="selectNode"
+              @getCheckedNodes="getCheckedNodes"
               :default-checked-keys="[1,2]">
             </el-tree>
           </div>
         </el-col>
-        <el-col :span="12">
-          dsfdf
+        <el-col :span="16">
+          <div style="min-height:300px;">
+            <el-table
+              :data="btnTableData"
+              border
+              size="mini"
+              style="width: 100%;min-height:300px;"
+              @selection-change="selectChange"
+              >
+              <el-table-column
+                type="selection"
+                width="50">
+              </el-table-column>
+              <el-table-column
+                prop="title"
+                label="标题"
+                width="120">
+              </el-table-column>
+              <el-table-column
+                prop="resourceNo"
+                label="编码"
+                width="180">
+              </el-table-column>
+              <el-table-column
+                prop="description"
+                label="描述">
+              </el-table-column>
+            </el-table>
+          </div>
         </el-col>
       </el-row>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="dialogFormVisible = false">取 消</el-button>
-        <el-button size="mini" type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button size="mini" @click="setRolePermissionDialog = false">取 消</el-button>
+        <el-button size="mini" type="primary" @click="getCheckedNodes">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -109,7 +140,9 @@
         pageSize:10,
         pageTotal:0,
         setRolePermissionDialog:false,
-        treeData: []
+        treeData: [],
+        btnTableData:[],
+        setRoleId:''
       }
     },
     mounted: function () {
@@ -154,9 +187,41 @@
       del:function(id){
         console.log(id)
       },
-      setRolePermissoin:function(){
+      setRolePermissoin:function(id){
+        this.setRoleId = id;
         this.setRolePermissionDialog = true;
         this.loadTreeDataList();
+      },
+      selectNode:function(va1,va2,va3){
+        var choseNode = {label:'',id:0,resourceNo:''}
+        console.log(va1.label);
+        choseNode.label = va1.label;
+        choseNode.id = va1.id;
+        choseNode.resourceNo = va1.resourceNo;
+        this.choseNode = choseNode;
+        var that = this;
+        this.queryChildById(va1.id);
+      },
+      queryChildById:function(id){
+        var that = this;
+        apiService.resource.queryChildById({id:id}).then(function(res){
+          that.btnTableData = res.data.data;
+        });
+      },
+      getCheckedNodes() {
+        var ll = this.$refs.tree.getCheckedNodes();
+        var menuArray = new Array();
+        ll.forEach(function(v,i){
+            menuArray.push(v.id);
+        });
+        console.log(menuArray.join(","));
+        console.log(this.setRoleId);
+        var params  = {roleId:this.setRoleId,menus:menuArray.join(",")};
+        apiService.roleResource.batchSave(params).then(function(res){
+          console.log(res.data);
+        });
+
+        ///console.log(this.$refs.tree.getCheckedNodes());
       }
     }
   }
@@ -169,5 +234,13 @@
 
 .el-tree-node__label{
   font-size:12px;
+}
+
+.el-dialog__body{
+  padding:20px !important;
+}
+
+.rolePermissionPanelLeft{
+  border-left:1px solid #efefef;border-top:1px solid #efefef;border-bottom:1px solid #efefef;min-height:300px;
 }
 </style>

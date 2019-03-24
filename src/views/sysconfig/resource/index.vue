@@ -1,16 +1,16 @@
 <template >
   <div style="padding:10px;">
     <el-row>
-      <el-col :span="12"><div >
+      <el-col :span="10"><div >
         
         <!-- show-checkbox -->
         <div class="custom-tree-container" style="">
           <div class="block" style="font-size:12px !important;">
             <!-- <p><h3>配置资源菜单</h3></p> -->
-            <div style="border:1px solid rgb(239, 239, 239);padding:10px;height:50px;">
+            <div style="border-left:1px solid rgb(239, 239, 239);border-top:1px solid rgb(239, 239, 239);border-bottom:1px solid rgb(239, 239, 239);padding:10px;height:50px;">
               <el-button size="mini" type="primary" @click="addTopMenu">新增父菜单</el-button>
             </div>
-            <div style="padding:25px;border:1px solid #efefef;min-height:400px;">
+            <div style="padding:25px;border-left:1px solid #efefef;border-bottom:1px solid #efefef;min-height:400px;">
               <el-tree
                 :data="data5"
                 node-key="id"
@@ -42,8 +42,8 @@
 
 
         </div></el-col>
-      <el-col :span="12">
-        <div style="border:1px solid rgb(239, 239, 239);padding:10px;">
+      <el-col :span="14">
+        <div style="border-left:1px solid rgb(239, 239, 239);border-top:1px solid rgb(239, 239, 239);border-right:1px solid rgb(239, 239, 239);padding:10px;">
           <el-button size="mini" type="primary" @click="addBtnPer">新增权限</el-button>
           <!-- <el-button size="mini" >编辑权限</el-button> -->
           <el-button size="mini" @click="delBtnPer">删除权限</el-button>

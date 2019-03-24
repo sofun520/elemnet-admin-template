@@ -60,8 +60,20 @@ let resource = {
     }
 }
 
+
+let roleResource = {
+    batchSave:function(params){
+        return fetch.fetch({
+            url: '/api/roleresource/batchSave',
+            method: 'post',
+            data: params
+        })
+    }
+}
+
 apiService.user = user;
 apiService.role = role;
 apiService.resource = resource;
+apiService.roleResource = roleResource;
 
 export default apiService;
