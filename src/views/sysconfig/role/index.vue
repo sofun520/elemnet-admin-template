@@ -82,18 +82,19 @@
               ref="tree"
               @node-click="selectNode"
               @getCheckedNodes="getCheckedNodes"
-              :default-checked-keys="[1,2]">
+              :default-checked-keys="treeCheckedKeys">
             </el-tree>
           </div>
         </el-col>
         <el-col :span="16">
           <div style="min-height:300px;">
             <el-table
+              ref="multipleTable"
               :data="btnTableData"
               border
               size="mini"
               style="width: 100%;min-height:300px;"
-              @selection-change="selectChange"
+              @select="selectOne"
               >
               <el-table-column
                 type="selection"
@@ -118,7 +119,7 @@
         </el-col>
       </el-row>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="setRolePermissionDialog = false">取 消</el-button>
+        <el-button size="mini" @click="setRolePermissionDialog = false;btnTableData=[]">取 消</el-button>
         <el-button size="mini" type="primary" @click="getCheckedNodes">确 定</el-button>
       </div>
     </el-dialog>
@@ -142,7 +143,8 @@
         setRolePermissionDialog:false,
         treeData: [],
         btnTableData:[],
-        setRoleId:''
+        setRoleId:'',
+        treeCheckedKeys:[]
       }
     },
     mounted: function () {
@@ -151,6 +153,20 @@
         })
     },
     methods:{
+      loadTreeSelectDataList:function(roleId){
+        var that = this;
+        apiService.roleResource.lavelTreeSelectData({roleId:roleId}).then(function(res){
+          if(res.data.data){
+            var resourceSelectArray = new Array();
+            res.data.data.forEach(function(v,i){
+              resourceSelectArray.push(v.resourceId);
+            });
+            that.treeCheckedKeys = resourceSelectArray;
+            console.log(resourceSelectArray.join(","));
+          }
+        });
+        
+      },
       loadTreeDataList:function(){
         var that = this;
         apiService.resource.lavel_tree({}).then(function(res){
@@ -191,6 +207,23 @@
         this.setRoleId = id;
         this.setRolePermissionDialog = true;
         this.loadTreeDataList();
+        this.loadTreeSelectDataList(id);
+        this.btnTableData = [];
+      },
+      queryRoleBtnPermission:function(roleId,parentId){
+        var that = this;
+        apiService.roleResource.queryRoleBtnPermission({roleId:roleId,parentId:parentId}).then(function(res){
+          console.log(res.data.data);
+          that.btnTableData.forEach(row=>{
+            res.data.data.forEach(da=>{
+              if(row.id==da.id){
+                that.$refs.multipleTable.toggleRowSelection(row);
+                console.log(row);
+              }
+            });
+          });
+
+        });
       },
       selectNode:function(va1,va2,va3){
         var choseNode = {label:'',id:0,resourceNo:''}
@@ -201,6 +234,7 @@
         this.choseNode = choseNode;
         var that = this;
         this.queryChildById(va1.id);
+        this.queryRoleBtnPermission(that.setRoleId,va1.id);
       },
       queryChildById:function(id){
         var that = this;
@@ -209,19 +243,38 @@
         });
       },
       getCheckedNodes() {
+        var that = this;
         var ll = this.$refs.tree.getCheckedNodes();
         var menuArray = new Array();
         ll.forEach(function(v,i){
             menuArray.push(v.id);
         });
-        console.log(menuArray.join(","));
-        console.log(this.setRoleId);
         var params  = {roleId:this.setRoleId,menus:menuArray.join(",")};
         apiService.roleResource.batchSave(params).then(function(res){
-          console.log(res.data);
+          if(res.data.success){
+            that.$message({
+              message: '配置角色菜单权限成功',
+              type: 'success'
+            });
+          }
+          //清除集合数据，关闭对话框
+          that.setRolePermissionDialog = false;
+          that.treeCheckedKeys = [];
+          that.treeData = [];
+          that.btnTableData = [];
         });
-
-        ///console.log(this.$refs.tree.getCheckedNodes());
+      },
+      selectOne:function(selection, row){
+        // console.log(selection);
+        console.log(row.id);
+        //选择一行时
+        var roleResource = {};
+        roleResource.roleId = this.setRoleId;
+        roleResource.resourceId = row.id;
+        console.log(roleResource);
+        apiService.roleResource.choseOrNot(roleResource).then(function(res){
+          // console.log(res.data);
+        });
       }
     }
   }
@@ -242,5 +295,9 @@
 
 .rolePermissionPanelLeft{
   border-left:1px solid #efefef;border-top:1px solid #efefef;border-bottom:1px solid #efefef;min-height:300px;
+}
+
+.el-checkbox{
+
 }
 </style>

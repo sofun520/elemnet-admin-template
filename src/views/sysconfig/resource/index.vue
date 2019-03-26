@@ -43,7 +43,7 @@
 
         </div></el-col>
       <el-col :span="14">
-        <div style="border-left:1px solid rgb(239, 239, 239);border-top:1px solid rgb(239, 239, 239);border-right:1px solid rgb(239, 239, 239);padding:10px;">
+        <div style="height:50px;border-left:1px solid rgb(239, 239, 239);border-top:1px solid rgb(239, 239, 239);border-right:1px solid rgb(239, 239, 239);padding:10px;">
           <el-button size="mini" type="primary" @click="addBtnPer">新增权限</el-button>
           <!-- <el-button size="mini" >编辑权限</el-button> -->
           <el-button size="mini" @click="delBtnPer">删除权限</el-button>
