@@ -10,7 +10,7 @@
       <el-form-item size="mini">
         <el-button  size="mini" type="primary" @click="searchSubmit">查询</el-button>
         <el-button  size="mini"  @click="searchForm={};loadList()">重置</el-button>
-        <el-button  size="mini"  @click="searchForm={};loadList()">新建用户</el-button>
+        <el-button  size="mini"  @click="createUserDialogVisiable=true;">新建用户</el-button>
       </el-form-item>
     </el-form>
 
@@ -72,6 +72,39 @@
       </el-pagination>
     </div>
 
+    <el-dialog :close-on-click-modal="false" title="创建用户" :visible.sync="createUserDialogVisiable" width="40%">
+      <div style="padding:0 20px 0 20px;margin-bottom:30px;">
+        <el-form ref="saveSysUserForm" size="mini" :rules="sysUserRule" :model="sysUser" label-width="80px">
+          <el-form-item label="用户名" prop="account">
+            <el-input v-model="sysUser.account"></el-input>
+          </el-form-item>
+          <el-form-item label="昵称" prop="name">
+            <el-input v-model="sysUser.name"></el-input>
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input type="password" v-model="sysUser.password" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="确认密码" prop="surePassword">
+            <el-input type="password" v-model="sysUser.surePassword" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="手机号码" prop="phone">
+            <el-input v-model="sysUser.phone"></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="sysUser.email"></el-input>
+          </el-form-item>
+          <el-form-item label="备注">
+            <el-input v-model="sysUser.remark"></el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="createUserDialogVisiable = false;">取 消</el-button>
+        <el-button size="mini" type="primary" @click="saveUserSubmit('saveSysUserForm')">确 定</el-button>
+      </div>
+    </el-dialog>
+
+
     <!-- @change="handleCheckedCitiesChange" -->
     <el-dialog :close-on-click-modal="false" title="配置用户角色" :visible.sync="setUserRoleDialogVisiable" width="40%">
       <div style="padding:0 20px 0 20px;margin-bottom:30px;">
@@ -93,6 +126,24 @@
   import apiService from '@/api/apiService';
   export default {
     data() {
+      var validatePass2 = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请再次输入密码'));
+        } else if (value !== this.sysUser.password) {
+          callback(new Error('两次输入密码不一致!'));
+        } else {
+          callback();
+        }
+      };
+      var validatePhone = (rule, value, callback)=>{
+        var reg= /^((0\d{2,3}-\d{7,8})|(1[3584]\d{9}))$/;
+        console.log(reg.test(value))
+        if(reg.test(value)){
+          callback();
+        }else{
+          callback(new Error('手机号码格式错误'));
+        }
+      }
       return {
         loading:false,
         tableData: [],
@@ -106,7 +157,17 @@
         checkedRoles:[],
         roles:[],
         setUserRoleDialogVisiable:false,
-        setUserId:''
+        setUserId:'',
+        createUserDialogVisiable:false,
+        sysUser:{},
+        sysUserRule:{
+          account:[{ required: true, message: '用户名不能为空'}],
+          name:[{ required: true, message: '昵称不能为空'}],
+          password:[{ required: true, message: '密码不能为空'}],
+          surePassword:[{ required: true, message: '密码不能为空'},{ validator: validatePass2, trigger: 'blur' }],
+          email:[{ type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }],
+          phone:[{ validator: validatePhone, trigger: 'blur' }]
+        }
       }
     },
     mounted: function () {
@@ -183,6 +244,28 @@
           }
         });
 
+      },
+      saveUserSubmit:function(formName){
+        console.log('save user')
+        var that = this;
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            
+            console.log(that.sysUser);
+            apiService.user.save(that.sysUser).then(res=>{
+              console.log(res.data.success);
+              if(res.data.success){
+                that.$message.info('创建用户成功');
+                that.createUserDialogVisiable = false;
+                that.sysUser = {};
+                that.loadList();
+              }
+            });
+
+          }else{
+            that.$message.error('表单校验失败');
+          }
+        });
       }
     }
   }
@@ -195,5 +278,13 @@
 .el-checkbox{
   /* width: 200px;
   float: left; */
+}
+
+.el-select-dropdown__item{
+  font-size:12px;
+}
+
+.el-form-item__label{
+  font-size: 12px;
 }
 </style>

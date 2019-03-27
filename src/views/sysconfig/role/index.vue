@@ -10,7 +10,7 @@
       <el-form-item size="mini">
         <el-button  size="mini" type="primary" @click="searchSubmit">查询</el-button>
         <el-button  size="mini"  @click="searchForm={};loadList()">重置</el-button>
-        <el-button  size="mini"  @click="searchForm={};loadList()">新建角色</el-button>
+        <el-button  size="mini"  @click="createRolerDialogVisiable=true;">新建角色</el-button>
       </el-form-item>
     </el-form>
 
@@ -68,6 +68,26 @@
         >
       </el-pagination>
     </div>
+
+    <el-dialog :close-on-click-modal="false" title="创建角色" :visible.sync="createRolerDialogVisiable" width="40%">
+      <div style="padding:0 20px 0 20px;margin-bottom:30px;">
+        <el-form ref="saveSysRoleForm" size="mini" :rules="sysRoleRule" :model="sysRole" label-width="80px">
+          <el-form-item label="角色名称" prop="name">
+            <el-input v-model="sysRole.name"></el-input>
+          </el-form-item>
+          <el-form-item label="角色代码" prop="roleNo">
+            <el-input v-model="sysRole.roleNo"></el-input>
+          </el-form-item>
+          <el-form-item label="角色描述" prop="roleDesc">
+            <el-input v-model="sysRole.roleDesc"></el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="createRolerDialogVisiable = false;">取 消</el-button>
+        <el-button size="mini" type="primary" @click="saveRoleSubmit('saveSysRoleForm')">确 定</el-button>
+      </div>
+    </el-dialog>
 
     <el-dialog :close-on-click-modal="false" title="配置角色菜单" :visible.sync="setRolePermissionDialog" width="60%">
       <el-row>
@@ -144,7 +164,14 @@
         treeData: [],
         btnTableData:[],
         setRoleId:'',
-        treeCheckedKeys:[]
+        treeCheckedKeys:[],
+        createRolerDialogVisiable:false,
+        sysRoleRule:{
+          name:[{ required: true, message: '角色名称不能为空'}],
+          roleNo:[{ required: true, message: '角色代码不能为空'}],
+          roleDesc:[{ required: true, message: '角色描述不能为空'}]
+        },
+        sysRole:{}
       }
     },
     mounted: function () {
@@ -275,6 +302,23 @@
         apiService.roleResource.choseOrNot(roleResource).then(function(res){
           // console.log(res.data);
         });
+      },
+      saveRoleSubmit:function(formName){
+        var that = this;
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            apiService.role.save(that.sysRole).then(res=>{
+              if(res.data.success){
+                that.$message.info('创建角色成功');
+                that.createRolerDialogVisiable = false;
+                that.sysRole = {};
+                that.loadList();
+              }
+            });
+          }else{
+            that.$message.error('表单校验失败');
+          }
+        });
       }
     }
   }
@@ -299,5 +343,9 @@
 
 .el-checkbox{
 
+}
+
+.el-form-item__label{
+  font-size: 12px;
 }
 </style>

@@ -43,11 +43,12 @@ export default {
   name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!isvalidUsername(value)) {
-        callback(new Error('请输入正确的用户名'))
-      } else {
-        callback()
-      }
+      // if (!isvalidUsername(value)) {
+      //   callback(new Error('请输入正确的用户名'))
+      // } else {
+      //   callback()
+      // }
+      callback()
     }
     const validatePass = (rule, value, callback) => {
       if (value.length < 5) {
@@ -97,14 +98,6 @@ export default {
             if(response.data.success && response.data.data.token){
               that.loading = false
               localStorage.setItem("token",response.data.data.token);
-
-              console.log('sdfdsfdf');
-
-              var constantRouterMap = [{ path: '/login', component: () => import('@/views/login/index'), hidden: true },
-  { path: '/404', component: () => import('@/views/404'), hidden: true }];
-              
-              router.addRoutes();
-
 
               //将用户信息保存到vuex中
               that.$store.dispatch('Login', this.loginForm).then(() => {

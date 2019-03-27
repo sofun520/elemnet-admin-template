@@ -23,6 +23,13 @@ let user = {
             method: 'post',
             data: params
         })
+    },
+    save:function(params){
+        return fetch.fetch({
+            url: '/api/user/save',
+            method: 'post',
+            data: params
+        })
     }
 }
 
@@ -39,6 +46,13 @@ let role={
             url: '/api/role/page',
             method: 'get',
             params: params
+        })
+    },
+    save:function(params){
+        return fetch.fetch({
+            url: '/api/role/save',
+            method: 'post',
+            data: params
         })
     }
 }
